@@ -1,0 +1,45 @@
+plugins {
+    id("java")
+}
+
+group = "org.example.my-app"
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(11))
+}
+
+configurations {
+    compileClasspath {
+        useLatestVersionsAndLock(it)
+    }
+    runtimeClasspath {
+        useLatestVersionsAndLock(it)
+    }
+    testCompileClasspath {
+        useLatestVersionsAndLock(it)
+    }
+    testRuntimeClasspath {
+        useLatestVersionsAndLock(it)
+    }
+}
+
+
+void useLatestVersionsAndLock(Configuration conf) {
+    conf.resolutionStrategy {
+        eachDependency {
+            if (requested.version.isEmpty()) { useVersion("latest.release") }
+        }
+        activateDependencyLocking()
+    }
+}
+
+dependencies.components.all {
+    def version = id.version
+    if (version.contains("beta") || version.contains("alpha")) {
+        // Tell Gradle to not treat versions that contain 'beta' or 'alpha' as released
+        status = "milestone"
+    }
+}
+
+
+
